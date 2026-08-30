@@ -83,7 +83,7 @@ const teacherStats: Array<[typeof Users, string, string]> = [
 ];
 
 const navItems: Array<{ id: View; label: string; icon: typeof LayoutDashboard }> = [
-  { id: 'today', label: '今日训练', icon: LayoutDashboard },
+  { id: 'today', label: '首页', icon: LayoutDashboard },
   { id: 'pronunciation', label: '普通话纠音', icon: AudioLines },
   { id: 'speech', label: '即兴演讲', icon: Mic2 },
   { id: 'growth', label: '成长档案', icon: Trophy },
@@ -110,7 +110,7 @@ export default function Home() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const musicNodesRef = useRef<OscillatorNode[]>([]);
 
-  const isPronunciation = view === 'pronunciation';
+  const isPronunciation = view !== 'speech';
   const isTraining = view === 'today' || view === 'pronunciation' || view === 'speech';
   const activeTopic = topics[topicIndex];
 
@@ -274,40 +274,65 @@ export default function Home() {
     audioContextRef.current = null;
   }
 
+  function goTo(id: string, nextView?: View) {
+    if (nextView) chooseView(nextView);
+    window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 20);
+  }
+
   return (
-    <main className="site-shell min-h-screen text-foreground">
-      <div className="ambient ambient-one" aria-hidden="true" />
-      <div className="ambient ambient-two" aria-hidden="true" />
-      <header className="topbar">
-        <button className="brand-mark" onClick={() => chooseView('today')} aria-label="返回今日训练">
+    <main className="portfolio-site min-h-screen text-foreground">
+      <header className="portfolio-topbar">
+        <button className="brand-mark" onClick={() => goTo('home', 'today')} aria-label="返回首页">
           <span className="brand-icon"><AudioLines className="size-5" /></span>
           <span><strong>声动课堂</strong><small>VOICE LAB · 2026</small></span>
         </button>
-        <div className="topbar-meta"><span className="status-dot" />课堂训练系统已就绪</div>
-        <button className="profile-pill" aria-label="个人中心"><span>连续训练 4 天</span><CircleUserRound className="size-5" /></button>
+        <div className="topbar-meta"><span className="status-dot" />系统已就绪</div>
+        <button className="profile-pill" onClick={() => goTo('growth')} aria-label="查看成长档案"><span>连续训练 4 天</span><CircleUserRound className="size-5" /></button>
       </header>
 
-      <section className="workspace">
-        <div className="masthead">
-          <div>
-            <p className="masthead-kicker">AI SPEECH TRAINING SYSTEM</p>
-            <h1>{view === 'teacher' ? '看见每一次成长' : view === 'growth' ? '声音会留下轨迹' : '让表达，被听见。'}</h1>
+      <section className="hero-wrap" id="home">
+        <div className="hero-frame">
+          <div className="hero-art" aria-hidden="true"><span className="hero-orbit orbit-one" /><span className="hero-orbit orbit-two" /><AudioLines /></div>
+          <div className="hero-copy">
+            <p>AI SPEECH TRAINING · 2026</p>
+            <h1>让每一次开口，<br />都更有力量。</h1>
+            <span>普通话纠音 × 即兴演讲 × 录音诊断<br />为真实《演讲与口才》课堂而设计</span>
+            <div className="hero-actions"><Button onClick={() => goTo('pronunciation', 'pronunciation')} className="hero-primary"><Mic2 />开始一次训练</Button><button onClick={() => goTo('story')} className="hero-link">了解作品 <span>↘</span></button></div>
           </div>
-          <p className="masthead-note">普通话纠音 × 即兴演讲 × 录音诊断<br />为真实《演讲与口才》课堂而设计</p>
+          <div className="hero-stamp"><b>06</b><span>核心<br />学习场景</span></div>
         </div>
 
-        <div className="floating-nav-wrap">
+        <div className="floating-nav-wrap portfolio-nav-wrap">
           <nav className="floating-nav" aria-label="主要功能">
             {navItems.map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => chooseView(id)} className={view === id ? 'active' : ''}>
+              <button key={id} onClick={() => goTo(id === 'today' ? 'home' : id, id === 'pronunciation' || id === 'speech' ? id : undefined)} className={view === id ? 'active' : ''}>
                 <Icon className="size-[17px]" /><span>{label}</span>
               </button>
             ))}
+            <button onClick={() => goTo('analysis')}><BarChart3 className="size-[17px]" /><span>录音分析</span></button>
           </nav>
         </div>
+      </section>
 
-        <section className="view-stage" key={view}>
-          {isTraining && (
+      <section className="manifesto" id="story">
+        <p>不是给课堂加一个花架子</p>
+        <h2>把“敢说、说准、说清楚”<br />变成一条看得见的成长路径。</h2>
+        <div className="manifesto-meta"><span>真实问题</span><span>科学反馈</span><span>可持续训练</span></div>
+      </section>
+
+      <section className="showcase-section light-scene" id="pronunciation">
+        <div className="scene-heading"><span>01 / PRONUNCIATION</span><h2>听见每一个音<br />哪里需要更准确</h2><p>跟读标准文本，系统记录语速、停顿与发音表现，给出可再次练习的具体建议。</p></div>
+        <div className="scene-card pronunciation-visual"><div className="sound-rings"><AudioLines /></div><div className="glass-caption"><small>普通话纠音</small><strong>把每一个音，说清楚。</strong><button onClick={() => { chooseView('pronunciation'); document.getElementById('training-lab')?.scrollIntoView({ behavior: 'smooth' }); }}>进入专项训练 ↗</button></div></div>
+      </section>
+
+      <section className="showcase-section dark-scene" id="speech">
+        <div className="scene-heading"><span>02 / IMPROMPTU SPEECH</span><h2>一个题目<br />两分钟讲清观点</h2><p>从真实情境出发，用准备倒计时、录音和结构提示完成一次完整表达。</p></div>
+        <div className="speech-stage"><div className="stage-light" /><Mic2 className="stage-mic" /><div className="topic-capsule"><small>本次即兴题目</small><strong>{activeTopic.title}</strong><button onClick={() => { chooseView('speech'); document.getElementById('training-lab')?.scrollIntoView({ behavior: 'smooth' }); }}>现在开讲 ↗</button></div></div>
+      </section>
+
+      <section className="training-lab" id="training-lab">
+        <div className="lab-intro"><span>LIVE PRACTICE TOOL</span><h2>{isPronunciation ? '普通话纠音实验室' : '即兴演讲实验室'}</h2><div><button className={isPronunciation ? 'active' : ''} onClick={() => chooseView('pronunciation')}>普通话纠音</button><button className={view === 'speech' ? 'active' : ''} onClick={() => chooseView('speech')}>即兴演讲</button></div></div>
+        {isTraining && (
             <TrainingView
               view={view}
               phase={phase}
@@ -330,11 +355,17 @@ export default function Home() {
               onShuffle={shuffleTopic}
             />
           )}
-          {view === 'growth' && <GrowthView />}
-          {view === 'teacher' && <TeacherView />}
-        </section>
       </section>
-      <footer className="site-footer"><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></footer>
+
+      <section className="showcase-section analysis-scene" id="analysis">
+        <div className="scene-heading"><span>03 / RECORDING ANALYSIS</span><h2>一次录音<br />不只得到一个分数</h2><p>把语速、停顿、口头语和表达结构拆成可理解、可行动的课堂反馈。</p></div>
+        <div className="analysis-preview"><div className="score-hero"><span>综合表现</span><strong>{result.overall}</strong><small>本地演示分析</small></div><div className="analysis-lines">{[['发音清晰度',result.clarity],['表达流畅度',result.fluency],['结构完整度',result.structure]].map(([label,value]) => <MetricBar key={label as string} label={label as string} value={value as number} color="#f1ad3f" />)}<div className="music-inline"><Music2 /><div><b>演讲配乐</b><span>{musicMode}</span></div><button onClick={toggleMusic}>{musicPlaying ? '停止' : '试听'}</button></div></div></div>
+      </section>
+
+      <section className="editorial-panel" id="growth"><GrowthView /></section>
+      <section className="editorial-panel teacher-panel" id="teacher"><TeacherView /></section>
+
+      <footer className="portfolio-footer"><p>准备好让声音<br />成为你的力量了吗？</p><button onClick={() => goTo('training-lab', 'pronunciation')}><Mic2 />开始训练</button><div><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></div></footer>
     </main>
   );
 }
