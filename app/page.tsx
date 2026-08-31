@@ -68,12 +68,18 @@ const topics = [
 ];
 
 const readingText = '语言是思想的声音。清晰准确的表达，不仅能够传递信息，也能够建立理解、赢得信任。';
+const pronunciationTokens = [
+  ['语', 'yǔ'], ['言', 'yán'], ['是', 'shì'], ['思', 'sī'], ['想', 'xiǎng'], ['的', 'de'], ['声', 'shēng'], ['音', 'yīn'],
+  ['清', 'qīng'], ['晰', 'xī'], ['准', 'zhǔn'], ['确', 'què'], ['表', 'biǎo'], ['达', 'dá'],
+];
 const waveform = [24, 41, 64, 38, 76, 52, 86, 46, 68, 32, 58, 78, 44, 64, 28, 49, 72, 36, 57, 31, 66, 43];
 const teacherRows = [
   ['林晓雨', '5次', '86', '+12', '前后鼻音'],
   ['周子涵', '4次', '82', '+9', '语速偏快'],
   ['陈一诺', '3次', '79', '+7', '平翘舌'],
   ['王嘉言', '5次', '88', '+14', '结构完整度'],
+  ['许知远', '3次', '77', '+6', '无意义停顿'],
+  ['韩思齐', '4次', '84', '+10', '结尾收束'],
 ];
 
 const teacherStats: Array<[typeof Users, string, string]> = [
@@ -120,6 +126,7 @@ export default function Home() {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const musicNodesRef = useRef<OscillatorNode[]>([]);
+  const analysisTimerRef = useRef<number | null>(null);
 
   const isPronunciation = view !== 'speech';
   const activeTopic = topics[topicIndex];
@@ -150,6 +157,7 @@ export default function Home() {
 
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
+    if (analysisTimerRef.current) window.clearTimeout(analysisTimerRef.current);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     stopMusic();
   }, [audioUrl]);
@@ -174,6 +182,8 @@ export default function Home() {
   }, [attempt, isPronunciation, seconds, transcript]);
 
   function resetTraining(nextView?: View) {
+    if (analysisTimerRef.current) window.clearTimeout(analysisTimerRef.current);
+    analysisTimerRef.current = null;
     setPhase('idle');
     setSeconds(0);
     setTranscript('');
@@ -235,11 +245,14 @@ export default function Home() {
   }
 
   function stopRecording() {
-    recorderRef.current?.stop();
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
     recognitionRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
     setPhase('analyzing');
-    window.setTimeout(() => setPhase('result'), 1400);
+    analysisTimerRef.current = window.setTimeout(() => {
+      setPhase('result');
+      analysisTimerRef.current = null;
+    }, 1400);
   }
 
   function retryTraining() {
@@ -301,7 +314,7 @@ export default function Home() {
 
   function openFeature(id: FeatureId) {
     if (id === 'pronunciation' || id === 'speech') chooseView(id);
-    window.history.pushState({}, '', `${window.location.pathname}?feature=${id}`);
+    window.history.pushState({ feature: id }, '', `${window.location.pathname}?feature=${id}`);
     setFeature(id);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
@@ -309,7 +322,7 @@ export default function Home() {
   function closeFeature() {
     if (phase === 'recording') stopRecording();
     resetTraining('today');
-    window.history.pushState({}, '', window.location.pathname);
+    window.history.replaceState({}, '', window.location.pathname);
     setFeature(null);
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
@@ -374,11 +387,14 @@ export default function Home() {
           <span><strong>声动课堂</strong><small>VOICE LAB · 2026</small></span>
         </button>
         <div className="topbar-meta"><span className="status-dot" />系统已就绪</div>
-        <button className="profile-pill" onClick={() => goTo('growth')} aria-label="查看成长档案"><span>连续训练 4 天</span><CircleUserRound className="size-5" /></button>
+        <button className="profile-pill" onClick={() => openFeature('growth')} aria-label="查看成长档案"><span>连续训练 4 天</span><CircleUserRound className="size-5" /></button>
       </header>
 
       <section className="hero-wrap" id="home">
         <div className="hero-frame">
+          <video className="hero-loop" autoPlay muted loop playsInline poster="./shinchan-hero.jpg" aria-hidden="true">
+            <source src="./shinchan-speech-loop.mp4" type="video/mp4" />
+          </video>
           <div className="hero-art" aria-hidden="true"><span className="hero-orbit orbit-one" /><span className="hero-orbit orbit-two" /><AudioLines /></div>
           <div className="hero-copy">
             <p>AI SPEECH TRAINING · 2026</p>
@@ -406,11 +422,11 @@ export default function Home() {
         <div className="profile-prop"><span>ITEM</span><strong>话筒</strong><small>把每次开口变成一次舞台。</small></div>
         {/* Static export keeps this single responsive artwork as a plain image. */}
         {/* oxlint-disable-next-line next/no-img-element */}
-        <img className="profile-character" src="/shinchan-hero.jpg" alt="蜡笔小新手持话筒进行演讲训练" />
+        <img className="profile-character" src="./shinchan-hero.jpg" alt="蜡笔小新手持话筒进行演讲训练" />
         <div className="profile-copy"><p>表达搭档</p><h2>小新陪你<br />大胆开口</h2><span>不怕说错，先敢于表达；再通过录音、纠音和复盘，让每一次练习都有迹可循。</span></div>
         <div className="profile-features" aria-label="六项学习功能">
-          {featureEntries.map(({ id, label, eyebrow, description, icon: Icon }) => (
-            <button key={id} onClick={() => openFeature(id)}>
+          {featureEntries.map(({ id, label, eyebrow, description, icon: Icon }, index) => (
+            <button key={id} onClick={() => openFeature(id)} style={{ '--card-index': index } as CSSProperties}>
               <Icon />
               <span>{eyebrow}</span>
               <strong>{label}</strong>
@@ -451,13 +467,22 @@ function FeatureExperience({ entry, onBack, children }: { entry: (typeof feature
     <main className={`feature-page feature-${entry.id}`}>
       <header className="feature-topbar"><button onClick={onBack}>← 返回首页</button><span>声动课堂 · 独立功能空间</span></header>
       <section className="feature-cover">
-        <div className="feature-cover-art" />
+        <FeatureHeroVisual id={entry.id} />
         <div className="feature-glass-title"><Icon /><small>{entry.eyebrow} / SPEECH LAB</small><h1>{entry.label}</h1><p>{entry.description}</p><span>向下进入功能 ↓</span></div>
       </section>
       <section className="feature-workspace">{children}</section>
       <footer className="feature-footer"><button onClick={onBack}>返回全部功能</button><span>VOICE LAB · 2026</span></footer>
     </main>
   );
+}
+
+function FeatureHeroVisual({ id }: { id: FeatureId }) {
+  if (id === 'pronunciation') return <div className="feature-visual pronunciation-lab" aria-hidden="true"><div className="lab-grid" /><div className="syllable-track">{['zh','ch','sh','r'].map((sound) => <span key={sound}>{sound}</span>)}</div><div className="lab-wave">{waveform.map((height,index) => <i key={`${height}-${index}`} style={{ height: `${height + 18}%` }} />)}</div><AudioLines className="lab-core" /></div>;
+  if (id === 'speech') return <div className="feature-visual speech-theatre" aria-hidden="true"><div className="curtain curtain-left" /><div className="curtain curtain-right" /><div className="theatre-beam" /><div className="topic-lottery"><small>随机题目</small><strong>如果声音有颜色</strong><span>PREP · 60</span></div><Mic2 className="theatre-mic" /></div>;
+  if (id === 'analysis') return <div className="feature-visual analysis-dashboard" aria-hidden="true"><div className="dash-score"><small>VOICE SCORE</small><strong>86</strong></div><div className="dash-bars">{[62,84,71,92,78,88,69,95].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div><div className="dash-timeline">{Array.from({ length: 18 },(_,index) => <span key={index} />)}</div></div>;
+  if (id === 'music') return <div className="feature-visual music-room" aria-hidden="true"><div className="turntable"><i /><span /></div><div className="music-notes"><Music2 /><span>WARM STORY</span></div><div className="equalizer">{[28,62,44,82,58,92,36,70].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div></div>;
+  if (id === 'growth') return <div className="feature-visual growth-path" aria-hidden="true"><div className="path-line" />{[0,1,2,3,4].map((index) => <span className={`path-node node-${index}`} key={index}>{index === 4 ? <Trophy /> : index + 1}</span>)}<div className="growth-badge"><Sparkles /><strong>连续 4 天</strong></div></div>;
+  return <div className="feature-visual teacher-console" aria-hidden="true"><div className="console-stats"><span><b>32</b>学生</span><span><b>126</b>训练</span><span><b>81.4</b>均分</span></div><div className="student-matrix">{Array.from({ length: 30 },(_,index) => <i key={index} className={index % 7 === 0 || index % 11 === 0 ? 'focus' : ''} />)}</div><div className="console-scan" /></div>;
 }
 
 function MusicStudio({ musicMode, musicPlaying, onMusicMode, onToggleMusic }: { musicMode: string; musicPlaying: boolean; onMusicMode: (mode: string) => void; onToggleMusic: () => void }) {
@@ -555,27 +580,51 @@ function TrainingView(props: {
   const title = props.view === 'today' ? '今天，练一次有力量的表达' : isPronunciation ? '把每一个音，说清楚' : '用两分钟，讲清一个观点';
   const eyebrow = props.view === 'today' ? "TODAY'S PRACTICE" : isPronunciation ? 'PRONUNCIATION LAB' : 'IMPROMPTU SPEECH';
   return (
-    <div className="view-content">
+    <div className={`view-content training-view ${isPronunciation ? 'pronunciation-training' : 'speech-training'}`}>
       <PageHeading eyebrow={eyebrow} title={title} description={isPronunciation ? '跟读标准文本，获得字词、语速、停顿和流畅度分析。' : '从真实话题出发，完成准备、表达、诊断和二次改进。'} action={!isPronunciation ? <Button onClick={props.onShuffle} variant="outline" className="h-10 self-start rounded-xl px-4 sm:self-auto"><Shuffle /> 换一个训练题</Button> : undefined} />
 
       {phase !== 'result' ? (
-        <div className="training-grid">
-          <article className="training-card">
+        <div className={`training-grid ${isPronunciation ? 'phonetic-training-grid' : 'stage-training-grid'}`}>
+          <article className={`training-card ${isPronunciation ? 'phonetic-training-card' : 'stage-training-card'}`}>
             <div className="training-card-top">
               <div className="flex items-center gap-2.5"><Badge className="bg-[#12262b] px-2.5">{isPronunciation ? '专项朗读' : '即兴演讲'}</Badge><span className="text-xs text-muted-foreground">第 {attempt} 次训练</span></div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock3 className="size-3.5" />{isPronunciation ? '建议朗读 30 秒' : '准备 60 秒 · 演讲 2 分钟'}</div>
             </div>
             <div className="training-card-body">
               <div className="flex items-start gap-4"><div className="hidden size-11 shrink-0 place-items-center rounded-2xl bg-[#fff0ec] text-[#e85d44] sm:grid"><BookOpenText className="size-5" /></div><div><p className="text-xs font-medium text-muted-foreground">{isPronunciation ? '朗读文本' : '今日题目'}</p><h2 className="mt-2 max-w-3xl text-xl font-semibold leading-relaxed md:text-[26px]">{isPronunciation ? readingText : topic.title}</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{isPronunciation ? '请自然朗读，不必刻意放慢；系统将重点关注前后鼻音、平翘舌和停顿。' : topic.cue}</p></div></div>
+              {isPronunciation ? (
+                <div className="phonetic-strip" aria-label="逐字拼音标注">
+                  <div className="phonetic-strip-head"><span>逐字标音</span><small>声调 · 音节 · 发音位置</small></div>
+                  <div className="phonetic-token-row">{pronunciationTokens.map(([character, pinyin], index) => <span key={`${character}-${index}`}><small>{pinyin}</small><strong>{character}</strong></span>)}</div>
+                  <div className="phonetic-focus"><b>本轮重点</b><span>zh / ch / sh</span><span>an / ang</span><span>en / eng</span></div>
+                </div>
+              ) : (
+                <div className="speech-prep-panel">
+                  <div className={`countdown-orbit ${phase === 'preparing' ? 'is-running' : ''}`}><small>PREP</small><strong>{phase === 'preparing' ? seconds : '60'}</strong><span>秒</span></div>
+                  <div className="speech-structure-track"><span><b>01</b>观点先行</span><i /><span><b>02</b>具体例证</span><i /><span><b>03</b>回扣题目</span></div>
+                </div>
+              )}
               <Recorder phase={phase} seconds={seconds} transcript={transcript} error={micError} isPronunciation={isPronunciation} onPrepare={props.onStartPreparation} onRecord={props.onStartRecording} onStop={props.onStopRecording} />
             </div>
           </article>
-          <aside className="side-stack"><WeeklyGrowth /><TipCard isPronunciation={isPronunciation} /></aside>
+          <aside className="side-stack">{isPronunciation ? <PronunciationFocus /> : <SpeechStructure />}<TipCard isPronunciation={isPronunciation} /></aside>
         </div>
       ) : (
         <ResultView result={result} transcript={transcript} audioUrl={audioUrl} attempt={attempt} musicMode={props.musicMode} musicPlaying={props.musicPlaying} onMusicMode={props.onMusicMode} onToggleMusic={props.onToggleMusic} onRetry={props.onRetry} />
       )}
     </div>
+  );
+}
+
+function PronunciationFocus() {
+  return (
+    <div className="pronunciation-focus-card"><span>VOICE POSITION</span><h3>口腔发音定位</h3><div>{[['zh','舌尖后'],['sh','摩擦音'],['ang','后鼻韵']].map(([sound,label]) => <p key={sound}><b>{sound}</b><small>{label}</small></p>)}</div><em>跟着标音逐字朗读，错误音节会在诊断后单独列出。</em></div>
+  );
+}
+
+function SpeechStructure() {
+  return (
+    <div className="speech-structure-card"><span>STAGE CUE</span><h3>两分钟表达节奏</h3><div><p><b>00:00</b>亮观点</p><p><b>00:30</b>讲例子</p><p><b>01:30</b>做收束</p></div><em>倒计时只提示节奏，不打断演讲。</em></div>
   );
 }
 
@@ -602,12 +651,6 @@ function Recorder({ phase, seconds, transcript, error, isPronunciation, onPrepar
   );
 }
 
-function WeeklyGrowth() {
-  return (
-    <div className="rounded-[22px] border border-border bg-card p-5 shadow-[0_14px_38px_rgba(26,48,51,.05)]"><div className="flex items-center justify-between"><div><p className="text-sm font-semibold">本周成长</p><p className="mt-1 text-xs text-muted-foreground">相比上周提升 11%</p></div><Sparkles className="size-5 text-[#ef6248]" /></div><div className="mt-6 space-y-5">{[['发音清晰度',86,'#2f8177'],['表达流畅度',74,'#e26b52'],['结构完整度',68,'#d8a346']].map(([label,value,color]) => <MetricBar key={label as string} label={label as string} value={value as number} color={color as string} />)}</div></div>
-  );
-}
-
 function TipCard({ isPronunciation }: { isPronunciation: boolean }) {
   return (
     <div className="flex w-full items-center gap-4 rounded-[22px] border border-border bg-[#fffaf3] p-5"><div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#ffe9d2] text-[#a6601c]"><Lightbulb className="size-5" /></div><div><p className="text-sm font-semibold">{isPronunciation ? '朗读小提示' : '表达结构提示'}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{isPronunciation ? '先看完整句意，再按语义自然停顿。' : '观点先行，用一个具体例子支撑，结尾回扣题目。'}</p></div></div>
@@ -619,6 +662,15 @@ function MetricBar({ label, value, color }: { label: string; value: number; colo
 }
 
 function ResultView({ result, transcript, audioUrl, attempt, musicMode, musicPlaying, onMusicMode, onToggleMusic, onRetry }: { result: { overall: number; clarity: number; fluency: number; structure: number; speed: number; pauses: number; fillers: number }; transcript: string; audioUrl: string; attempt: number; musicMode: string; musicPlaying: boolean; onMusicMode: (mode: string) => void; onToggleMusic: () => void; onRetry: () => void }) {
+  function saveReport() {
+    const report = [`声动课堂 · 第 ${attempt} 次训练报告`,`综合表现：${result.overall}`,`清晰度：${result.clarity}`,`流畅度：${result.fluency}`,`完整度：${result.structure}`,`语速：${result.speed} 字/分钟`,`不当停顿：${result.pauses} 次`,`口头语：${result.fillers} 次`,transcript ? `转写：${transcript}` : '转写：当前浏览器未提供语音转写'].join('\n');
+    const href = URL.createObjectURL(new Blob([report], { type: 'text/plain;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = `声动课堂-训练报告-${attempt}.txt`;
+    link.click();
+    URL.revokeObjectURL(href);
+  }
   return (
     <div className="result-grid grid gap-5 xl:grid-cols-[.82fr_1.18fr]">
       <div className="score-card rounded-[34px] bg-[#173037] p-6 text-white shadow-[0_18px_45px_rgba(20,48,53,.16)] md:p-8">
@@ -643,7 +695,7 @@ function ResultView({ result, transcript, audioUrl, attempt, musicMode, musicPla
         </div>
         <div className="grid gap-5 md:grid-cols-[1fr_auto]">
           <div className="rounded-[22px] border border-border bg-[#fffaf3] p-5"><div className="flex items-center gap-2"><Music2 className="size-4 text-[#a6601c]" /><p className="text-sm font-semibold">演讲配乐预览</p></div><div className="mt-4 flex flex-wrap gap-2">{['温暖叙事','坚定励志','沉静思考'].map((mode) => <button key={mode} onClick={() => onMusicMode(mode)} className={`rounded-full px-3 py-1.5 text-xs ${musicMode === mode ? 'bg-[#173037] text-white' : 'bg-white text-muted-foreground'}`}>{mode}</button>)}</div><Button onClick={onToggleMusic} variant="outline" className="mt-4 rounded-xl"><Headphones />{musicPlaying ? '停止预览' : '预览配乐'}</Button></div>
-          <div className="flex min-w-[190px] flex-col justify-center gap-3 rounded-[22px] border border-border bg-white p-5"><Button onClick={onRetry} className="h-11 rounded-xl bg-[#ef6248] text-white hover:bg-[#dc553d]"><RefreshCw />再次训练</Button><Button variant="outline" className="h-10 rounded-xl"><Download />保存报告</Button></div>
+          <div className="flex min-w-[190px] flex-col justify-center gap-3 rounded-[22px] border border-border bg-white p-5"><Button onClick={onRetry} className="h-11 rounded-xl bg-[#ef6248] text-white hover:bg-[#dc553d]"><RefreshCw />再次训练</Button><Button onClick={saveReport} variant="outline" className="h-10 rounded-xl"><Download />保存报告</Button></div>
         </div>
       </div>
     </div>
@@ -666,10 +718,21 @@ function GrowthView() {
 }
 
 function TeacherView() {
+  const [showAll, setShowAll] = useState(false);
+  function exportClassReport() {
+    const header = ['学生','本周训练','最近得分','进步','重点建议'];
+    const csv = [header,...teacherRows].map((row) => row.join(',')).join('\n');
+    const href = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = '声动课堂-班级训练报告.csv';
+    link.click();
+    URL.revokeObjectURL(href);
+  }
   return (
-    <div className="view-content"><PageHeading eyebrow="TEACHER DASHBOARD" title="把个别纠音，变成可跟踪的教学反馈" description="教师查看班级共性问题、学生进步和待干预对象，AI建议可由教师复核。" action={<Button className="h-11 self-start rounded-full bg-[#3f7774] px-5 text-white sm:self-auto"><Download />导出班级报告</Button>} />
+    <div className="view-content"><PageHeading eyebrow="TEACHER DASHBOARD" title="把个别纠音，变成可跟踪的教学反馈" description="教师查看班级共性问题、学生进步和待干预对象，AI建议可由教师复核。" action={<Button onClick={exportClassReport} className="h-11 self-start rounded-full bg-[#3f7774] px-5 text-white sm:self-auto"><Download />导出班级报告</Button>} />
       <div className="teacher-stats grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{teacherStats.map(([Icon,value,label], index) => <div key={label} className={`rounded-[28px] border border-border p-5 ${index === 0 ? 'featured-stat' : 'glass-card bg-white'}`}><div className="flex items-center justify-between"><Icon className="size-5 text-[#2f8177]" /><span className="text-[11px] text-muted-foreground">较上周 ↑</span></div><p className="mt-5 text-4xl font-semibold">{value}</p><p className="mt-1 text-xs text-muted-foreground">{label}</p></div>)}</div>
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]"><div className="overflow-hidden rounded-[24px] border border-border bg-white"><div className="flex items-center justify-between border-b border-border p-5"><div><p className="font-semibold">学生训练概览</p><p className="mt-1 text-xs text-muted-foreground">按最近一次训练结果排序</p></div><Button variant="outline" size="sm">查看全部</Button></div><div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-[#f3f7f5] text-xs text-muted-foreground"><tr>{['学生','本周训练','最近得分','进步','重点建议'].map((head) => <th key={head} className="px-5 py-3 font-medium">{head}</th>)}</tr></thead><tbody>{teacherRows.map((row) => <tr key={row[0]} className="border-t border-border"><td className="px-5 py-4 font-medium">{row[0]}</td><td className="px-5 py-4">{row[1]}</td><td className="px-5 py-4 font-semibold">{row[2]}</td><td className="px-5 py-4 text-[#267269]">{row[3]}</td><td className="px-5 py-4"><Badge variant="secondary">{row[4]}</Badge></td></tr>)}</tbody></table></div></div>
+      <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]"><div className="overflow-hidden rounded-[24px] border border-border bg-white"><div className="flex items-center justify-between border-b border-border p-5"><div><p className="font-semibold">学生训练概览</p><p className="mt-1 text-xs text-muted-foreground">按最近一次训练结果排序</p></div><Button onClick={() => setShowAll((current) => !current)} variant="outline" size="sm">{showAll ? '收起' : '查看全部'}</Button></div><div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-[#f3f7f5] text-xs text-muted-foreground"><tr>{['学生','本周训练','最近得分','进步','重点建议'].map((head) => <th key={head} className="px-5 py-3 font-medium">{head}</th>)}</tr></thead><tbody>{teacherRows.slice(0, showAll ? teacherRows.length : 4).map((row) => <tr key={row[0]} className="border-t border-border"><td className="px-5 py-4 font-medium">{row[0]}</td><td className="px-5 py-4">{row[1]}</td><td className="px-5 py-4 font-semibold">{row[2]}</td><td className="px-5 py-4 text-[#267269]">{row[3]}</td><td className="px-5 py-4"><Badge variant="secondary">{row[4]}</Badge></td></tr>)}</tbody></table></div></div>
         <div className="rounded-[24px] border border-border bg-white p-5"><div className="flex items-center gap-2"><Volume2 className="size-5 text-[#ef6248]" /><p className="font-semibold">班级共性问题</p></div><div className="mt-6 space-y-5">{[['前后鼻音混淆',68],['语速偏快',54],['无意义口头语',47],['结尾缺少收束',39]].map(([label,value]) => <div key={label as string}><div className="mb-2 flex justify-between text-xs"><span>{label}</span><span className="text-muted-foreground">{value}%</span></div><Progress value={value as number} className="[&_[data-slot=progress-track]]:h-2 [&_[data-slot=progress-indicator]]:bg-[#ef6248]" /></div>)}</div><div className="mt-6 rounded-2xl bg-[#fffaf3] p-4"><p className="text-xs font-semibold">教学建议</p><p className="mt-2 text-xs leading-5 text-muted-foreground">下次课堂可安排“an/ang、en/eng”最小对立词专项练习，并抽取三名学生进行前后对比。</p></div></div>
       </div>
     </div>
