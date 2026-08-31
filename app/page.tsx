@@ -314,11 +314,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="manifesto" id="story">
-        <p>不是给课堂加一个花架子</p>
-        <h2>把“敢说、说准、说清楚”<br />变成一条看得见的成长路径。</h2>
-        <div className="manifesto-meta"><span>真实问题</span><span>科学反馈</span><span>可持续训练</span></div>
+      <section className="character-profile" id="story">
+        <div className="profile-kicker"><span>CHARACTER</span><strong>野原新之助</strong><small>5岁 / 春日部 / 表达训练搭档</small></div>
+        <div className="profile-prop"><span>ITEM</span><strong>话筒</strong><small>把每次开口变成一次舞台。</small></div>
+        {/* Static export keeps this single responsive artwork as a plain image. */}
+        {/* oxlint-disable-next-line next/no-img-element */}
+        <img className="profile-character" src="/shinchan-hero.jpg" alt="蜡笔小新手持话筒进行演讲训练" />
+        <article className="profile-card profile-card-left"><span>发音热身</span><strong>大象，大象，<br />你的鼻子怎么那么长？</strong></article>
+        <article className="profile-card profile-card-right"><span>即兴题目</span><strong>今天最想<br />分享的一件事</strong></article>
+        <div className="profile-copy"><p>表达搭档</p><h2>小新陪你<br />大胆开口</h2><span>不怕说错，先敢于表达；再通过录音、纠音和复盘，让每一次练习都有迹可循。</span></div>
+        <div className="profile-name">SHIN-CHAN</div>
       </section>
+
+      <div className="highlights-title" aria-hidden="true"><span>SELECTED PROJECTS</span><strong>Highlights</strong></div>
 
       <section className="showcase-section light-scene" id="pronunciation">
         <div className="scene-heading"><span>01 / PRONUNCIATION</span><h2>听见每一个音<br />哪里需要更准确</h2><p>跟读标准文本，系统记录语速、停顿与发音表现，给出可再次练习的具体建议。</p></div>

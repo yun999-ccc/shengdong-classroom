@@ -7,13 +7,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: '声动课堂｜让每一次开口，都更有力量',
     description: 'AI普通话纠音、即兴演讲、录音诊断与成长档案。',
-    images: ['https://yun999-ccc.github.io/shengdong-classroom/og.png'],
+    images: ['https://yun999-ccc.github.io/shengdong-classroom/og.jpg'],
   },
   twitter: {
     card: 'summary_large_image',
     title: '声动课堂｜让每一次开口，都更有力量',
     description: 'AI普通话纠音、即兴演讲、录音诊断与成长档案。',
-    images: ['https://yun999-ccc.github.io/shengdong-classroom/og.png'],
+    images: ['https://yun999-ccc.github.io/shengdong-classroom/og.jpg'],
   },
 };
 
