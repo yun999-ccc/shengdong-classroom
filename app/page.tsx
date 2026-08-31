@@ -33,6 +33,7 @@ import { Progress } from '@/components/ui/progress';
 
 type View = 'today' | 'pronunciation' | 'speech' | 'growth' | 'teacher';
 type Phase = 'idle' | 'preparing' | 'recording' | 'analyzing' | 'result';
+type FeatureId = 'pronunciation' | 'speech' | 'analysis' | 'music' | 'growth' | 'teacher';
 
 type SpeechRecognitionResultLike = {
   results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean }>;
@@ -82,6 +83,15 @@ const teacherStats: Array<[typeof Users, string, string]> = [
   [Activity, '+9.6', '平均提升'],
 ];
 
+const featureEntries: Array<{ id: FeatureId; label: string; eyebrow: string; description: string; icon: typeof Mic2 }> = [
+  { id: 'pronunciation', label: '普通话纠音', eyebrow: 'PRONUNCIATION', description: '跟读、发音与停顿反馈', icon: AudioLines },
+  { id: 'speech', label: '即兴演讲', eyebrow: 'IMPROMPTU', description: '题目、倒计时与结构提示', icon: Mic2 },
+  { id: 'analysis', label: '录音分析', eyebrow: 'ANALYSIS', description: '语速、口头语与表达诊断', icon: BarChart3 },
+  { id: 'music', label: '演讲配乐', eyebrow: 'SOUNDTRACK', description: '三种情绪氛围即时试听', icon: Music2 },
+  { id: 'growth', label: '成长档案', eyebrow: 'GROWTH', description: '连续训练与能力变化', icon: Trophy },
+  { id: 'teacher', label: '教师看板', eyebrow: 'TEACHER', description: '班级共性问题与教学反馈', icon: Users },
+];
+
 const navItems: Array<{ id: View; label: string; icon: typeof LayoutDashboard }> = [
   { id: 'today', label: '首页', icon: LayoutDashboard },
   { id: 'pronunciation', label: '普通话纠音', icon: AudioLines },
@@ -94,6 +104,7 @@ const formatTime = (seconds: number) => `${String(Math.floor(seconds / 60)).padS
 
 export default function Home() {
   const [view, setView] = useState<View>('today');
+  const [feature, setFeature] = useState<FeatureId | null>(null);
   const [phase, setPhase] = useState<Phase>('idle');
   const [topicIndex, setTopicIndex] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -111,8 +122,17 @@ export default function Home() {
   const musicNodesRef = useRef<OscillatorNode[]>([]);
 
   const isPronunciation = view !== 'speech';
-  const isTraining = view === 'today' || view === 'pronunciation' || view === 'speech';
   const activeTopic = topics[topicIndex];
+
+  useEffect(() => {
+    const readFeature = () => {
+      const requested = new URLSearchParams(window.location.search).get('feature') as FeatureId | null;
+      setFeature(featureEntries.some((entry) => entry.id === requested) ? requested : null);
+    };
+    readFeature();
+    window.addEventListener('popstate', readFeature);
+    return () => window.removeEventListener('popstate', readFeature);
+  }, []);
 
   useEffect(() => {
     if (phase !== 'preparing' && phase !== 'recording') return;
@@ -279,6 +299,73 @@ export default function Home() {
     window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 20);
   }
 
+  function openFeature(id: FeatureId) {
+    if (id === 'pronunciation' || id === 'speech') chooseView(id);
+    window.history.pushState({}, '', `${window.location.pathname}?feature=${id}`);
+    setFeature(id);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  function closeFeature() {
+    if (phase === 'recording') stopRecording();
+    resetTraining('today');
+    window.history.pushState({}, '', window.location.pathname);
+    setFeature(null);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  if (feature) {
+    const entry = featureEntries.find((item) => item.id === feature)!;
+    return (
+      <FeatureExperience entry={entry} onBack={closeFeature}>
+        {(feature === 'pronunciation' || feature === 'speech') && (
+          <TrainingView
+            view={feature}
+            phase={phase}
+            topic={activeTopic}
+            isPronunciation={feature === 'pronunciation'}
+            seconds={seconds}
+            transcript={transcript}
+            audioUrl={audioUrl}
+            micError={micError}
+            attempt={attempt}
+            result={result}
+            musicMode={musicMode}
+            musicPlaying={musicPlaying}
+            onMusicMode={setMusicMode}
+            onToggleMusic={toggleMusic}
+            onStartPreparation={beginPreparation}
+            onStartRecording={() => void startRecording()}
+            onStopRecording={stopRecording}
+            onRetry={retryTraining}
+            onShuffle={shuffleTopic}
+          />
+        )}
+        {feature === 'analysis' && (
+          <AnalysisStudio
+            phase={phase}
+            seconds={seconds}
+            transcript={transcript}
+            audioUrl={audioUrl}
+            micError={micError}
+            attempt={attempt}
+            result={result}
+            musicMode={musicMode}
+            musicPlaying={musicPlaying}
+            onMusicMode={setMusicMode}
+            onToggleMusic={toggleMusic}
+            onStartRecording={() => void startRecording()}
+            onStopRecording={stopRecording}
+            onRetry={retryTraining}
+          />
+        )}
+        {feature === 'music' && <MusicStudio musicMode={musicMode} musicPlaying={musicPlaying} onMusicMode={setMusicMode} onToggleMusic={toggleMusic} />}
+        {feature === 'growth' && <GrowthView />}
+        {feature === 'teacher' && <TeacherView />}
+      </FeatureExperience>
+    );
+  }
+
   return (
     <main className="portfolio-site min-h-screen text-foreground">
       <header className="portfolio-topbar">
@@ -297,7 +384,7 @@ export default function Home() {
             <p>AI SPEECH TRAINING · 2026</p>
             <h1>让每一次开口，<br />都更有力量。</h1>
             <span>普通话纠音 × 即兴演讲 × 录音诊断<br />为真实《演讲与口才》课堂而设计</span>
-            <div className="hero-actions"><Button onClick={() => goTo('pronunciation', 'pronunciation')} className="hero-primary"><Mic2 />开始一次训练</Button><button onClick={() => goTo('story')} className="hero-link">了解作品 <span>↘</span></button></div>
+            <div className="hero-actions"><Button onClick={() => openFeature('pronunciation')} className="hero-primary"><Mic2 />开始一次训练</Button><button onClick={() => goTo('story')} className="hero-link">了解作品 <span>↘</span></button></div>
           </div>
           <div className="hero-stamp"><b>06</b><span>核心<br />学习场景</span></div>
         </div>
@@ -305,11 +392,11 @@ export default function Home() {
         <div className="floating-nav-wrap portfolio-nav-wrap">
           <nav className="floating-nav" aria-label="主要功能">
             {navItems.map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => goTo(id === 'today' ? 'home' : id, id === 'pronunciation' || id === 'speech' ? id : undefined)} className={view === id ? 'active' : ''}>
+              <button key={id} onClick={() => id === 'today' ? goTo('home') : openFeature(id as FeatureId)} className={id === 'today' ? 'active' : ''}>
                 <Icon className="size-[17px]" /><span>{label}</span>
               </button>
             ))}
-            <button onClick={() => goTo('analysis')}><BarChart3 className="size-[17px]" /><span>录音分析</span></button>
+            <button onClick={() => openFeature('analysis')}><BarChart3 className="size-[17px]" /><span>录音分析</span></button>
           </nav>
         </div>
       </section>
@@ -320,9 +407,17 @@ export default function Home() {
         {/* Static export keeps this single responsive artwork as a plain image. */}
         {/* oxlint-disable-next-line next/no-img-element */}
         <img className="profile-character" src="/shinchan-hero.jpg" alt="蜡笔小新手持话筒进行演讲训练" />
-        <article className="profile-card profile-card-left"><span>发音热身</span><strong>大象，大象，<br />你的鼻子怎么那么长？</strong></article>
-        <article className="profile-card profile-card-right"><span>即兴题目</span><strong>今天最想<br />分享的一件事</strong></article>
         <div className="profile-copy"><p>表达搭档</p><h2>小新陪你<br />大胆开口</h2><span>不怕说错，先敢于表达；再通过录音、纠音和复盘，让每一次练习都有迹可循。</span></div>
+        <div className="profile-features" aria-label="六项学习功能">
+          {featureEntries.map(({ id, label, eyebrow, description, icon: Icon }) => (
+            <button key={id} onClick={() => openFeature(id)}>
+              <Icon />
+              <span>{eyebrow}</span>
+              <strong>{label}</strong>
+              <small>{description}</small>
+            </button>
+          ))}
+        </div>
         <div className="profile-name">SHIN-CHAN</div>
       </section>
 
@@ -330,51 +425,100 @@ export default function Home() {
 
       <section className="showcase-section light-scene" id="pronunciation">
         <div className="scene-heading"><span>01 / PRONUNCIATION</span><h2>听见每一个音<br />哪里需要更准确</h2><p>跟读标准文本，系统记录语速、停顿与发音表现，给出可再次练习的具体建议。</p></div>
-        <div className="scene-card pronunciation-visual"><div className="sound-rings"><AudioLines /></div><div className="glass-caption"><small>普通话纠音</small><strong>把每一个音，说清楚。</strong><button onClick={() => { chooseView('pronunciation'); document.getElementById('training-lab')?.scrollIntoView({ behavior: 'smooth' }); }}>进入专项训练 ↗</button></div></div>
+        <div className="scene-card pronunciation-visual"><div className="sound-rings"><AudioLines /></div><div className="glass-caption"><small>普通话纠音</small><strong>把每一个音，说清楚。</strong><button onClick={() => openFeature('pronunciation')}>进入专项训练 ↗</button></div></div>
       </section>
 
       <section className="showcase-section dark-scene" id="speech">
         <div className="scene-heading"><span>02 / IMPROMPTU SPEECH</span><h2>一个题目<br />两分钟讲清观点</h2><p>从真实情境出发，用准备倒计时、录音和结构提示完成一次完整表达。</p></div>
-        <div className="speech-stage"><div className="stage-light" /><Mic2 className="stage-mic" /><div className="topic-capsule"><small>本次即兴题目</small><strong>{activeTopic.title}</strong><button onClick={() => { chooseView('speech'); document.getElementById('training-lab')?.scrollIntoView({ behavior: 'smooth' }); }}>现在开讲 ↗</button></div></div>
-      </section>
-
-      <section className="training-lab" id="training-lab">
-        <div className="lab-intro"><span>LIVE PRACTICE TOOL</span><h2>{isPronunciation ? '普通话纠音实验室' : '即兴演讲实验室'}</h2><div><button className={isPronunciation ? 'active' : ''} onClick={() => chooseView('pronunciation')}>普通话纠音</button><button className={view === 'speech' ? 'active' : ''} onClick={() => chooseView('speech')}>即兴演讲</button></div></div>
-        {isTraining && (
-            <TrainingView
-              view={view}
-              phase={phase}
-              topic={activeTopic}
-              isPronunciation={isPronunciation}
-              seconds={seconds}
-              transcript={transcript}
-              audioUrl={audioUrl}
-              micError={micError}
-              attempt={attempt}
-              result={result}
-              musicMode={musicMode}
-              musicPlaying={musicPlaying}
-              onMusicMode={setMusicMode}
-              onToggleMusic={toggleMusic}
-              onStartPreparation={beginPreparation}
-              onStartRecording={() => void startRecording()}
-              onStopRecording={stopRecording}
-              onRetry={retryTraining}
-              onShuffle={shuffleTopic}
-            />
-          )}
+        <div className="speech-stage"><div className="stage-light" /><Mic2 className="stage-mic" /><div className="topic-capsule"><small>本次即兴题目</small><strong>{activeTopic.title}</strong><button onClick={() => openFeature('speech')}>现在开讲 ↗</button></div></div>
       </section>
 
       <section className="showcase-section analysis-scene" id="analysis">
         <div className="scene-heading"><span>03 / RECORDING ANALYSIS</span><h2>一次录音<br />不只得到一个分数</h2><p>把语速、停顿、口头语和表达结构拆成可理解、可行动的课堂反馈。</p></div>
-        <div className="analysis-preview"><div className="score-hero"><span>综合表现</span><strong>{result.overall}</strong><small>本地演示分析</small></div><div className="analysis-lines">{[['发音清晰度',result.clarity],['表达流畅度',result.fluency],['结构完整度',result.structure]].map(([label,value]) => <MetricBar key={label as string} label={label as string} value={value as number} color="#f1ad3f" />)}<div className="music-inline"><Music2 /><div><b>演讲配乐</b><span>{musicMode}</span></div><button onClick={toggleMusic}>{musicPlaying ? '停止' : '试听'}</button></div></div></div>
+        <button className="analysis-preview" onClick={() => openFeature('analysis')}><div className="score-hero"><span>综合表现</span><strong>{result.overall}</strong><small>点击进入录音诊断</small></div><div className="analysis-lines">{[['发音清晰度',result.clarity],['表达流畅度',result.fluency],['结构完整度',result.structure]].map(([label,value]) => <MetricBar key={label as string} label={label as string} value={value as number} color="#f1ad3f" />)}<div className="music-inline"><Music2 /><div><b>演讲配乐</b><span>{musicMode}</span></div><span className="analysis-enter">进入功能 ↗</span></div></div></button>
       </section>
 
-      <section className="editorial-panel" id="growth"><GrowthView /></section>
-      <section className="editorial-panel teacher-panel" id="teacher"><TeacherView /></section>
+      <SpotlightEnding onEnter={() => openFeature('pronunciation')} />
 
-      <footer className="portfolio-footer"><p>准备好让声音<br />成为你的力量了吗？</p><button onClick={() => goTo('training-lab', 'pronunciation')}><Mic2 />开始训练</button><div><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></div></footer>
+      <footer className="portfolio-footer"><p>准备好让声音<br />成为你的力量了吗？</p><button onClick={() => openFeature('pronunciation')}><Mic2 />开始训练</button><div><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></div></footer>
     </main>
+  );
+}
+
+function FeatureExperience({ entry, onBack, children }: { entry: (typeof featureEntries)[number]; onBack: () => void; children: React.ReactNode }) {
+  const Icon = entry.icon;
+  return (
+    <main className={`feature-page feature-${entry.id}`}>
+      <header className="feature-topbar"><button onClick={onBack}>← 返回首页</button><span>声动课堂 · 独立功能空间</span></header>
+      <section className="feature-cover">
+        <div className="feature-cover-art" />
+        <div className="feature-glass-title"><Icon /><small>{entry.eyebrow} / SPEECH LAB</small><h1>{entry.label}</h1><p>{entry.description}</p><span>向下进入功能 ↓</span></div>
+      </section>
+      <section className="feature-workspace">{children}</section>
+      <footer className="feature-footer"><button onClick={onBack}>返回全部功能</button><span>VOICE LAB · 2026</span></footer>
+    </main>
+  );
+}
+
+function MusicStudio({ musicMode, musicPlaying, onMusicMode, onToggleMusic }: { musicMode: string; musicPlaying: boolean; onMusicMode: (mode: string) => void; onToggleMusic: () => void }) {
+  return (
+    <div className="music-studio">
+      <div><span>SOUNDTRACK STUDIO</span><h2>给演讲加上一层<br />恰到好处的情绪</h2><p>选择表达氛围并即时试听。正式展示时，可以让音乐成为语气的衬托，而不是喧宾夺主。</p></div>
+      <div className="music-records">
+        {['温暖叙事','坚定励志','沉静思考'].map((mode, index) => <button key={mode} onClick={() => onMusicMode(mode)} className={musicMode === mode ? 'active' : ''}><i style={{ '--record-index': index } as CSSProperties} /><strong>{mode}</strong><span>{index === 0 ? '故事与回忆' : index === 1 ? '观点与倡议' : '反思与独白'}</span></button>)}
+      </div>
+      <Button onClick={onToggleMusic} className="music-play"><Headphones />{musicPlaying ? '停止试听' : `试听「${musicMode}」`}</Button>
+    </div>
+  );
+}
+
+function AnalysisStudio(props: {
+  phase: Phase;
+  seconds: number;
+  transcript: string;
+  audioUrl: string;
+  micError: string;
+  attempt: number;
+  result: { overall: number; clarity: number; fluency: number; structure: number; speed: number; pauses: number; fillers: number };
+  musicMode: string;
+  musicPlaying: boolean;
+  onMusicMode: (mode: string) => void;
+  onToggleMusic: () => void;
+  onStartRecording: () => void;
+  onStopRecording: () => void;
+  onRetry: () => void;
+}) {
+  if (props.phase === 'result') {
+    return <ResultView result={props.result} transcript={props.transcript} audioUrl={props.audioUrl} attempt={props.attempt} musicMode={props.musicMode} musicPlaying={props.musicPlaying} onMusicMode={props.onMusicMode} onToggleMusic={props.onToggleMusic} onRetry={props.onRetry} />;
+  }
+  return (
+    <div className="view-content analysis-capture">
+      <PageHeading eyebrow="RECORDING ANALYSIS" title="录一段真实表达，再看具体问题" description="录音结束后，系统从语速、停顿、清晰度、口头语和结构五个维度生成诊断。AI结果用于训练提示，最终判断由教师复核。" />
+      <article className="training-card">
+        <div className="training-card-top"><Badge>自由表达采样</Badge><span>建议 30–90 秒</span></div>
+        <div className="training-card-body">
+          <h2>请围绕“我最近学会的一件事”自然讲述一段话。</h2>
+          <p>不需要背稿，尽量保留真实语速和停顿，诊断结果会更有参考价值。</p>
+          <Recorder phase={props.phase} seconds={props.seconds} transcript={props.transcript} error={props.micError} isPronunciation={false} onPrepare={props.onStartRecording} onRecord={props.onStartRecording} onStop={props.onStopRecording} />
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function SpotlightEnding({ onEnter }: { onEnter: () => void }) {
+  function moveSpotlight(event: React.PointerEvent<HTMLElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+    event.currentTarget.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+  }
+  return (
+    <section className="spotlight-ending" onPointerMove={moveSpotlight}>
+      <div className="spotlight-dark" />
+      <div className="spotlight-reveal" />
+      <div className="spotlight-copy"><small>THE VOICE INSIDE</small><h2>声音的秘密<br />藏在每一次练习里</h2><p>移动光标，照亮小新的表达舞台。</p><button onClick={onEnter}>进入训练 ↗</button></div>
+      <div className="cursor-hint">移动光标 · 哪里亮起来</div>
+    </section>
   );
 }
 
