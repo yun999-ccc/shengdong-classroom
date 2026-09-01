@@ -142,6 +142,31 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const excludedCards = '.profile-features button, .analysis-preview, .music-records button';
+    const moveHighlight = (event: PointerEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest('button') as HTMLButtonElement | null;
+      if (!button || button.matches(excludedCards)) return;
+      const rect = button.getBoundingClientRect();
+      button.style.setProperty('--liquid-x', `${event.clientX - rect.left}px`);
+      button.style.setProperty('--liquid-y', `${event.clientY - rect.top}px`);
+      button.style.setProperty('--liquid-active', '1');
+    };
+    const clearHighlight = (event: PointerEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const button = event.target.closest('button') as HTMLButtonElement | null;
+      if (!button || button.matches(excludedCards) || (event.relatedTarget instanceof Node && button.contains(event.relatedTarget))) return;
+      button.style.setProperty('--liquid-active', '0');
+    };
+    document.addEventListener('pointermove', moveHighlight, { passive: true });
+    document.addEventListener('pointerout', clearHighlight, { passive: true });
+    return () => {
+      document.removeEventListener('pointermove', moveHighlight);
+      document.removeEventListener('pointerout', clearHighlight);
+    };
+  }, []);
+
+  useEffect(() => {
     if (phase !== 'preparing' && phase !== 'recording') return;
     const timer = window.setInterval(() => {
       setSeconds((current) => {
