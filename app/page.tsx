@@ -466,7 +466,9 @@ export default function Home() {
 
       <section className="showcase-section light-scene" id="pronunciation">
         <div className="scene-heading"><span>01 / PRONUNCIATION</span><h2>听见每一个音<br />哪里需要更准确</h2><p>跟读标准文本，系统记录语速、停顿与发音表现，给出可再次练习的具体建议。</p></div>
-        <div className="scene-card pronunciation-visual" aria-label="蜡笔小新与伙伴插画" />
+        <div className="scene-card pronunciation-visual" aria-label="蜡笔小新与伙伴插画">
+          <button className="pronunciation-enter" onClick={() => openFeature('pronunciation')}>进入专项训练 ↗</button>
+        </div>
       </section>
 
       <section className="showcase-section dark-scene" id="speech">
