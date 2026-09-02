@@ -481,7 +481,15 @@ export default function Home() {
 
       <SpotlightEnding onEnter={() => openFeature('pronunciation')} />
 
-      <footer className="portfolio-footer"><p>准备好让声音<br />成为你的力量了吗？</p><button onClick={() => openFeature('pronunciation')}><Mic2 />开始训练</button><div><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></div></footer>
+      <footer className="portfolio-footer sakura-ending">
+        <div className="sakura-ending-art" aria-hidden="true" />
+        <div className="sakura-ending-shade" aria-hidden="true" />
+        <div className="sakura-ending-content">
+          <p>准备好让声音<br />成为你的力量了吗？</p>
+          <button onClick={() => openFeature('pronunciation')}><Mic2 />开始训练</button>
+        </div>
+        <div className="sakura-ending-meta"><span>声动课堂 · AI辅助演讲与口才训练</span><span>真实训练 · 教师复核 · 持续成长</span></div>
+      </footer>
     </main>
   );
 }
