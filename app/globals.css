@@ -395,3 +395,11 @@ button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-re
 @keyframes liquid-glass-flow{0%,100%{background-position:135% 0;opacity:.54}50%{background-position:-35% 0;opacity:.92}}
 @media(prefers-reduced-motion:reduce){button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button))::after{animation:none;background-position:50% 0}button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button)){transition:none!important}}
 @media(max-width:640px){.portfolio-footer.sakura-ending{min-height:92svh;padding-bottom:30px}.sakura-ending-art{object-position:52% center}.sakura-ending-content{padding:22px 18px;border-radius:25px}.portfolio-footer.sakura-ending .sakura-ending-content>p{font-size:clamp(42px,12.5vw,67px);letter-spacing:-.08em}.sakura-ending-meta{align-items:flex-start;flex-direction:column;gap:10px;margin-top:26px;font-size:9px}}
+
+/* Pronunciation entry: user-selected artwork is intentionally a pure, edge-to-edge cover. */
+.feature-page.feature-pronunciation{padding:0;font-family:FangSong,STFangsong,"仿宋",serif;background:#f6ebde}
+.feature-pronunciation .feature-cover{min-height:100svh;border-radius:0;box-shadow:none;background:#f1d8d3}
+.feature-pronunciation .feature-cover::after{content:none}
+.feature-pronunciation .pronunciation-lab{background:url('/pronunciation-shinchan-cover.png') center/cover no-repeat}
+.feature-pronunciation .feature-workspace{font-family:FangSong,STFangsong,"仿宋",serif}
+@media(max-width:640px){.feature-pronunciation .feature-cover{min-height:100svh;border-radius:0}.feature-pronunciation .pronunciation-lab{background-position:66% center}}
