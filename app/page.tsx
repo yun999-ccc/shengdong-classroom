@@ -472,8 +472,9 @@ export default function Home() {
       </section>
 
       <section className="showcase-section dark-scene" id="speech">
-        <div className="scene-heading"><span>02 / IMPROMPTU SPEECH</span><h2>一个题目<br />两分钟讲清观点</h2><p>从真实情境出发，用准备倒计时、录音和结构提示完成一次完整表达。</p></div>
-        <div className="speech-stage"><div className="stage-light" /><Mic2 className="stage-mic" /><div className="topic-capsule"><small>本次即兴题目</small><strong>{activeTopic.title}</strong><button onClick={() => openFeature('speech')}>现在开讲 ↗</button></div></div>
+        <div className="speech-stage" aria-label="蜡笔小新与伙伴插画">
+          <button className="speech-enter" onClick={() => openFeature('speech')}>进入即兴训练 ↗</button>
+        </div>
       </section>
 
       <section className="showcase-section analysis-scene" id="analysis">
