@@ -198,7 +198,7 @@ html { scroll-behavior: smooth; }
 .scene-heading h2 { margin:0;font-size:clamp(44px,5.6vw,94px);font-weight:800;letter-spacing:-.065em;line-height:.95; }
 .scene-heading p { margin:0;color:rgba(24,48,51,.62);font-size:14px;line-height:1.8; }.dark-scene .scene-heading p,.analysis-scene .scene-heading p{color:rgba(255,248,232,.62)}
 .scene-card,.speech-stage { position:relative;overflow:hidden;max-width:1500px;min-height:min(72vw,820px);margin:auto;border-radius:46px;box-shadow:0 35px 90px rgba(22,47,48,.18); }
-.pronunciation-visual { background:linear-gradient(90deg,rgba(10,30,33,.35),transparent 60%),url('/shinchan-hero.jpg') center/cover no-repeat; }
+.pronunciation-visual { background:url('/pronunciation-shinchan-cover.png') center/cover no-repeat; }
 .sound-rings { position:absolute;right:9%;top:50%;display:grid;place-items:center;width:48%;aspect-ratio:1;border:2px solid rgba(255,255,255,.4);border-radius:50%;transform:translateY(-50%);box-shadow:0 0 0 55px rgba(255,255,255,.08),0 0 0 110px rgba(255,255,255,.05); }
 .sound-rings svg { width:42%;height:42%;color:#fff4d9; }
 .glass-caption,.topic-capsule { position:absolute;z-index:3;left:4%;bottom:5%;display:flex;flex-direction:column;align-items:start;width:min(620px,75%);padding:30px;border:1px solid rgba(255,255,255,.4);border-radius:30px;color:#fff8e8;background:rgba(16,42,44,.42);backdrop-filter:blur(24px); }
@@ -396,10 +396,4 @@ button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-re
 @media(prefers-reduced-motion:reduce){button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button))::after{animation:none;background-position:50% 0}button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button)){transition:none!important}}
 @media(max-width:640px){.portfolio-footer.sakura-ending{min-height:92svh;padding-bottom:30px}.sakura-ending-art{object-position:52% center}.sakura-ending-content{padding:22px 18px;border-radius:25px}.portfolio-footer.sakura-ending .sakura-ending-content>p{font-size:clamp(42px,12.5vw,67px);letter-spacing:-.08em}.sakura-ending-meta{align-items:flex-start;flex-direction:column;gap:10px;margin-top:26px;font-size:9px}}
 
-/* Pronunciation entry: user-selected artwork is intentionally a pure, edge-to-edge cover. */
-.feature-page.feature-pronunciation{padding:0;font-family:FangSong,STFangsong,"仿宋",serif;background:#f6ebde}
-.feature-pronunciation .feature-cover{min-height:100svh;border-radius:0;box-shadow:none;background:#f1d8d3}
-.feature-pronunciation .feature-cover::after{content:none}
-.feature-pronunciation .pronunciation-lab{background:url('/pronunciation-shinchan-cover.png') center/cover no-repeat}
-.feature-pronunciation .feature-workspace{font-family:FangSong,STFangsong,"仿宋",serif}
-@media(max-width:640px){.feature-pronunciation .feature-cover{min-height:100svh;border-radius:0}.feature-pronunciation .pronunciation-lab{background-position:66% center}}
+#pronunciation .scene-heading{font-family:FangSong,STFangsong,"仿宋",serif}

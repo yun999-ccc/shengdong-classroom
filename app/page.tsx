@@ -466,7 +466,7 @@ export default function Home() {
 
       <section className="showcase-section light-scene" id="pronunciation">
         <div className="scene-heading"><span>01 / PRONUNCIATION</span><h2>听见每一个音<br />哪里需要更准确</h2><p>跟读标准文本，系统记录语速、停顿与发音表现，给出可再次练习的具体建议。</p></div>
-        <div className="scene-card pronunciation-visual"><div className="sound-rings"><AudioLines /></div><div className="glass-caption"><small>普通话纠音</small><strong>把每一个音，说清楚。</strong><button onClick={() => openFeature('pronunciation')}>进入专项训练 ↗</button></div></div>
+        <div className="scene-card pronunciation-visual" aria-label="蜡笔小新与伙伴插画" />
       </section>
 
       <section className="showcase-section dark-scene" id="speech">
@@ -496,13 +496,12 @@ export default function Home() {
 
 function FeatureExperience({ entry, onBack, children }: { entry: (typeof featureEntries)[number]; onBack: () => void; children: React.ReactNode }) {
   const Icon = entry.icon;
-  const isPurePronunciationCover = entry.id === 'pronunciation';
   return (
     <main className={`feature-page feature-${entry.id}`}>
-      {!isPurePronunciationCover && <header className="feature-topbar"><button onClick={onBack}>← 返回首页</button><span>声动课堂 · 独立功能空间</span></header>}
+      <header className="feature-topbar"><button onClick={onBack}>← 返回首页</button><span>声动课堂 · 独立功能空间</span></header>
       <section className="feature-cover">
         <FeatureHeroVisual id={entry.id} />
-        {!isPurePronunciationCover && <div className="feature-glass-title"><Icon /><small>{entry.eyebrow} / SPEECH LAB</small><h1>{entry.label}</h1><p>{entry.description}</p><span>向下进入功能 ↓</span></div>}
+        <div className="feature-glass-title"><Icon /><small>{entry.eyebrow} / SPEECH LAB</small><h1>{entry.label}</h1><p>{entry.description}</p><span>向下进入功能 ↓</span></div>
       </section>
       <section className="feature-workspace">{children}</section>
       <footer className="feature-footer"><button onClick={onBack}>返回全部功能</button><span>VOICE LAB · 2026</span></footer>
@@ -511,7 +510,7 @@ function FeatureExperience({ entry, onBack, children }: { entry: (typeof feature
 }
 
 function FeatureHeroVisual({ id }: { id: FeatureId }) {
-  if (id === 'pronunciation') return <div className="feature-visual pronunciation-lab" aria-hidden="true" />;
+  if (id === 'pronunciation') return <div className="feature-visual pronunciation-lab" aria-hidden="true"><div className="lab-grid" /><div className="syllable-track">{['zh','ch','sh','r'].map((sound) => <span key={sound}>{sound}</span>)}</div><div className="lab-wave">{waveform.map((height,index) => <i key={`${height}-${index}`} style={{ height: `${height + 18}%` }} />)}</div><AudioLines className="lab-core" /></div>;
   if (id === 'speech') return <div className="feature-visual speech-theatre" aria-hidden="true"><div className="curtain curtain-left" /><div className="curtain curtain-right" /><div className="theatre-beam" /><div className="topic-lottery"><small>随机题目</small><strong>如果声音有颜色</strong><span>PREP · 60</span></div><Mic2 className="theatre-mic" /></div>;
   if (id === 'analysis') return <div className="feature-visual analysis-dashboard" aria-hidden="true"><div className="dash-score"><small>VOICE SCORE</small><strong>86</strong></div><div className="dash-bars">{[62,84,71,92,78,88,69,95].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div><div className="dash-timeline">{Array.from({ length: 18 },(_,index) => <span key={index} />)}</div></div>;
   if (id === 'music') return <div className="feature-visual music-room" aria-hidden="true"><div className="turntable"><i /><span /></div><div className="music-notes"><Music2 /><span>WARM STORY</span></div><div className="equalizer">{[28,62,44,82,58,92,36,70].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div></div>;
