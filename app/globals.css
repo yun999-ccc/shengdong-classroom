@@ -149,15 +149,15 @@
 
 /* 2026 portfolio edition — a cinematic, continuous-scroll presentation */
 html { scroll-behavior: smooth; }
-.portfolio-site { overflow:hidden;background:#f2a13a;color:#173033; }
+.portfolio-site { overflow:hidden;background:#fff;color:#173033; }
 .portfolio-topbar { position:absolute;z-index:30;top:0;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-between;width:min(1500px,calc(100% - 72px));padding:26px 0;color:#fff8e8; }
 .portfolio-topbar .brand-mark { color:#fff8e8; }
 .portfolio-topbar .brand-icon { color:#173033;background:#ffd66b; }
 .portfolio-topbar .profile-pill { color:#fff8e8;background:rgba(20,48,50,.28);border-color:rgba(255,255,255,.22); }
-.hero-wrap { position:relative;padding:18px 18px 88px;min-height:100vh;background:#f2a13a; }
-.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:linear-gradient(120deg,#173e40 0%,#245c5b 50%,#ef9d36 125%);box-shadow:0 28px 80px rgba(91,54,11,.25); }
+.hero-wrap { position:relative;padding:18px 18px 88px;min-height:100vh;background:#fff; }
+.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:linear-gradient(120deg,#7fc6ec 0%,#a9dcf4 50%,#d9f0fb 125%);box-shadow:0 28px 80px rgba(65,126,162,.2); }
 .hero-frame::before { content:"";position:absolute;z-index:2;left:34%;right:6%;top:48%;height:2px;background:linear-gradient(90deg,transparent,#44d6c4,#ffb13b,transparent);box-shadow:0 0 14px #44d6c4,0 0 30px rgba(255,177,59,.7);opacity:.72;transform:rotate(-4deg);animation:laser-breathe 4.5s ease-in-out infinite; }
-.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,36,38,.88) 0%,rgba(10,36,38,.5) 42%,transparent 70%),linear-gradient(0deg,rgba(8,27,29,.45),transparent 48%); }
+.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(19,88,135,.76) 0%,rgba(35,130,181,.42) 42%,transparent 70%),linear-gradient(0deg,rgba(17,86,130,.32),transparent 48%); }
 .hero-art { position:absolute;inset:0;display:block;width:auto;aspect-ratio:auto;color:transparent;background:url('/shinchan-hero.jpg') center/cover no-repeat;filter:none;transform:none; }
 .hero-art>svg,.hero-orbit { display:none; }
 .hero-orbit { position:absolute;border:3px solid rgba(255,243,204,.5);border-radius:50%; }
