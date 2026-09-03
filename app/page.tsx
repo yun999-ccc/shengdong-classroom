@@ -417,10 +417,6 @@ export default function Home() {
 
       <section className="hero-wrap" id="home">
         <div className="hero-frame">
-          <video className="hero-loop" autoPlay muted loop playsInline poster="./shinchan-hero.jpg" aria-hidden="true">
-            <source src="./shinchan-speech-loop.mp4" type="video/mp4" />
-          </video>
-          <div className="hero-art" aria-hidden="true"><span className="hero-orbit orbit-one" /><span className="hero-orbit orbit-two" /><AudioLines /></div>
           <div className="hero-copy">
             <p>AI SPEECH TRAINING · 2026</p>
             <h1>让每一次开口，<br />都更有力量。</h1>

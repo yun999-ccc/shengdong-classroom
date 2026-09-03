@@ -155,17 +155,18 @@ html { scroll-behavior: smooth; }
 .portfolio-topbar .brand-icon { color:#fff;background:linear-gradient(135deg,#1d84ef,#3aa4ff); }
 .portfolio-topbar .profile-pill { color:#174a82;background:rgba(255,255,255,.65);border-color:rgba(255,255,255,.8); }
 .hero-wrap { position:relative;padding:18px 18px 88px;min-height:100vh;background:#fff; }
-.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:linear-gradient(120deg,#7fc6ec 0%,#a9dcf4 50%,#d9f0fb 125%);box-shadow:0 28px 80px rgba(65,126,162,.2); }
-.hero-frame::before { content:"";position:absolute;z-index:2;left:34%;right:6%;top:48%;height:2px;background:linear-gradient(90deg,transparent,#76e4ff,#b2efff,transparent);box-shadow:0 0 14px #76e4ff,0 0 30px rgba(112,215,255,.6);opacity:.72;transform:rotate(-4deg);animation:laser-breathe 4.5s ease-in-out infinite; }
-.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(19,88,135,.76) 0%,rgba(35,130,181,.42) 42%,transparent 70%),linear-gradient(0deg,rgba(17,86,130,.32),transparent 48%); }
-.hero-art { position:absolute;inset:0;display:block;width:auto;aspect-ratio:auto;color:transparent;background:url('/shinchan-hero.jpg') center/cover no-repeat;filter:none;transform:none; }
+.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:#a9dfff url('/sky-campus-stage.png') center/cover no-repeat;box-shadow:0 28px 80px rgba(65,126,162,.2); }
+.hero-frame::before { display:none; }
+.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(52,153,216,.3) 0%,rgba(91,184,238,.15) 43%,transparent 70%),linear-gradient(0deg,rgba(37,125,185,.13),transparent 46%); }
+.hero-art { display:none; }
 .hero-art>svg,.hero-orbit { display:none; }
 .hero-orbit { position:absolute;border:3px solid rgba(255,243,204,.5);border-radius:50%; }
 .orbit-one { inset:8%; }.orbit-two { inset:19%;border-style:dashed;animation:spin 22s linear infinite; }
-.hero-copy { position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 36px);max-width:850px;padding:130px clamp(30px,7vw,118px) 70px;color:#fff8e8; }
+.hero-copy { position:relative;z-index:3;display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 36px);max-width:760px;padding:145px clamp(36px,7.5vw,130px) 100px;color:#fff; }
 .hero-copy>p,.scene-heading>span,.lab-intro>span { margin:0 0 24px;font-size:11px;font-weight:800;letter-spacing:.28em; }
-.hero-copy h1 { margin:0;font-size:clamp(54px,7vw,122px);font-weight:800;letter-spacing:-.075em;line-height:.92;text-wrap:balance;animation:title-reveal 1s cubic-bezier(.22,1,.36,1) both; }
-.hero-copy>span { margin-top:30px;color:rgba(255,248,232,.66);font-size:clamp(13px,1.15vw,18px);line-height:1.8; }
+.hero-copy>p { color:#1974dc; }
+.hero-copy h1 { margin:0;font-size:clamp(52px,6.2vw,108px);font-weight:800;letter-spacing:-.075em;line-height:.94;text-wrap:balance;text-shadow:0 3px 18px rgba(31,119,179,.26);animation:title-reveal 1s cubic-bezier(.22,1,.36,1) both; }
+.hero-copy>span { margin-top:30px;color:rgba(24,95,160,.82);font-size:clamp(13px,1.15vw,18px);font-weight:700;line-height:1.8; }
 .hero-actions { display:flex;align-items:center;gap:28px;margin-top:34px; }
 .hero-primary { height:54px!important;padding:0 25px!important;border-radius:999px!important;color:#173638!important;background:#ffd269!important;box-shadow:0 14px 30px rgba(5,25,27,.22); }
 .hero-link { border:0;color:#fff8e8;background:transparent;font-size:13px;font-weight:700; }.hero-link span{margin-left:8px;font-size:20px;}
