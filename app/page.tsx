@@ -98,6 +98,12 @@ const featureEntries: Array<{ id: FeatureId; label: string; eyebrow: string; des
   { id: 'teacher', label: '教师看板', eyebrow: 'TEACHER', description: '班级共性问题与教学反馈', icon: Users },
 ];
 
+const musicTracks: Record<string, string> = {
+  '温暖叙事': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kevin_MacLeod_-_Long_Trail.ogg',
+  '坚定励志': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Maple_leaf_rag_-_played_by_Scott_Joplin_1916_V2.ogg',
+  '沉静思考': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Emotional_piano.wav',
+};
+
 const navItems: Array<{ id: View; label: string; icon: typeof LayoutDashboard }> = [
   { id: 'today', label: '首页', icon: LayoutDashboard },
   { id: 'pronunciation', label: '普通话纠音', icon: AudioLines },
@@ -124,8 +130,7 @@ export default function Home() {
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const musicNodesRef = useRef<OscillatorNode[]>([]);
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null);
   const analysisTimerRef = useRef<number | null>(null);
 
   const isPronunciation = view !== 'speech';
@@ -290,46 +295,42 @@ export default function Home() {
     resetTraining();
   }
 
+  function stopMusic() {
+    const audio = musicAudioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    musicAudioRef.current = null;
+  }
+
+  function playMusic(mode: string) {
+    stopMusic();
+    const audio = new Audio(musicTracks[mode] || musicTracks['温暖叙事']);
+    audio.loop = true;
+    audio.volume = .22;
+    audio.addEventListener('error', () => setMusicPlaying(false), { once: true });
+    musicAudioRef.current = audio;
+    void audio.play().then(() => setMusicPlaying(true)).catch(() => setMusicPlaying(false));
+  }
+
   function toggleMusic() {
     if (musicPlaying) {
       stopMusic();
       setMusicPlaying(false);
       return;
     }
-    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextCtor) return;
-    const context = new AudioContextCtor();
-    audioContextRef.current = context;
-    const master = context.createGain();
-    master.gain.setValueAtTime(.0001, context.currentTime);
-    master.gain.exponentialRampToValueAtTime(.035, context.currentTime + 1.2);
-    master.connect(context.destination);
-    const chordMap: Record<string, number[]> = {
-      '温暖叙事': [261.63, 329.63, 392],
-      '坚定励志': [293.66, 369.99, 440],
-      '沉静思考': [220, 261.63, 329.63],
-    };
-    const nodes = (chordMap[musicMode] || chordMap['温暖叙事']).map((frequency, index) => {
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = index === 0 ? 'sine' : 'triangle';
-      oscillator.frequency.value = frequency / (index === 0 ? 2 : 1);
-      gain.gain.value = index === 0 ? .55 : .18;
-      oscillator.connect(gain).connect(master);
-      oscillator.start();
-      return oscillator;
-    });
-    musicNodesRef.current = nodes;
-    setMusicPlaying(true);
+    playMusic(musicMode);
   }
 
-  function stopMusic() {
-    musicNodesRef.current.forEach((node) => {
-      try { node.stop(); } catch { /* already stopped */ }
-    });
-    musicNodesRef.current = [];
-    void audioContextRef.current?.close();
-    audioContextRef.current = null;
+  function chooseMusicMode(mode: string) {
+    const shouldResume = musicPlaying;
+    if (shouldResume) {
+      stopMusic();
+      setMusicPlaying(false);
+    }
+    setMusicMode(mode);
+    if (shouldResume) window.setTimeout(() => playMusic(mode), 0);
   }
 
   function goTo(id: string, nextView?: View) {
@@ -370,7 +371,7 @@ export default function Home() {
             result={result}
             musicMode={musicMode}
             musicPlaying={musicPlaying}
-            onMusicMode={setMusicMode}
+            onMusicMode={chooseMusicMode}
             onToggleMusic={toggleMusic}
             onStartPreparation={beginPreparation}
             onStartRecording={() => void startRecording()}
@@ -390,14 +391,14 @@ export default function Home() {
             result={result}
             musicMode={musicMode}
             musicPlaying={musicPlaying}
-            onMusicMode={setMusicMode}
+            onMusicMode={chooseMusicMode}
             onToggleMusic={toggleMusic}
             onStartRecording={() => void startRecording()}
             onStopRecording={stopRecording}
             onRetry={retryTraining}
           />
         )}
-        {feature === 'music' && <MusicStudio musicMode={musicMode} musicPlaying={musicPlaying} onMusicMode={setMusicMode} onToggleMusic={toggleMusic} />}
+        {feature === 'music' && <MusicStudio musicMode={musicMode} musicPlaying={musicPlaying} onMusicMode={chooseMusicMode} onToggleMusic={toggleMusic} />}
         {feature === 'growth' && <GrowthView />}
         {feature === 'teacher' && <TeacherView />}
       </FeatureExperience>
