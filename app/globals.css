@@ -149,15 +149,15 @@
 
 /* 2026 portfolio edition — a cinematic, continuous-scroll presentation */
 html { scroll-behavior: smooth; }
-.portfolio-site { overflow:hidden;background:#f2a13a;color:#173033; }
+.portfolio-site { overflow:hidden;background:#fff;color:#173033; }
 .portfolio-topbar { position:absolute;z-index:30;top:0;left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-between;width:min(1500px,calc(100% - 72px));padding:26px 0;color:#fff8e8; }
-.portfolio-topbar .brand-mark { color:#fff8e8; }
-.portfolio-topbar .brand-icon { color:#173033;background:#ffd66b; }
-.portfolio-topbar .profile-pill { color:#fff8e8;background:rgba(20,48,50,.28);border-color:rgba(255,255,255,.22); }
-.hero-wrap { position:relative;padding:18px 18px 88px;min-height:100vh;background:#f2a13a; }
-.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:linear-gradient(120deg,#173e40 0%,#245c5b 50%,#ef9d36 125%);box-shadow:0 28px 80px rgba(91,54,11,.25); }
-.hero-frame::before { content:"";position:absolute;z-index:2;left:34%;right:6%;top:48%;height:2px;background:linear-gradient(90deg,transparent,#44d6c4,#ffb13b,transparent);box-shadow:0 0 14px #44d6c4,0 0 30px rgba(255,177,59,.7);opacity:.72;transform:rotate(-4deg);animation:laser-breathe 4.5s ease-in-out infinite; }
-.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,36,38,.88) 0%,rgba(10,36,38,.5) 42%,transparent 70%),linear-gradient(0deg,rgba(8,27,29,.45),transparent 48%); }
+.portfolio-topbar .brand-mark { color:#174a82; }
+.portfolio-topbar .brand-icon { color:#fff;background:linear-gradient(135deg,#1d84ef,#3aa4ff); }
+.portfolio-topbar .profile-pill { color:#174a82;background:rgba(255,255,255,.65);border-color:rgba(255,255,255,.8); }
+.hero-wrap { position:relative;padding:18px 18px 88px;min-height:100vh;background:#fff; }
+.hero-frame { position:relative;overflow:hidden;min-height:calc(100vh - 36px);border-radius:42px;background:linear-gradient(120deg,#7fc6ec 0%,#a9dcf4 50%,#d9f0fb 125%);box-shadow:0 28px 80px rgba(65,126,162,.2); }
+.hero-frame::before { content:"";position:absolute;z-index:2;left:34%;right:6%;top:48%;height:2px;background:linear-gradient(90deg,transparent,#76e4ff,#b2efff,transparent);box-shadow:0 0 14px #76e4ff,0 0 30px rgba(112,215,255,.6);opacity:.72;transform:rotate(-4deg);animation:laser-breathe 4.5s ease-in-out infinite; }
+.hero-frame::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(19,88,135,.76) 0%,rgba(35,130,181,.42) 42%,transparent 70%),linear-gradient(0deg,rgba(17,86,130,.32),transparent 48%); }
 .hero-art { position:absolute;inset:0;display:block;width:auto;aspect-ratio:auto;color:transparent;background:url('/shinchan-hero.jpg') center/cover no-repeat;filter:none;transform:none; }
 .hero-art>svg,.hero-orbit { display:none; }
 .hero-orbit { position:absolute;border:3px solid rgba(255,243,204,.5);border-radius:50%; }
@@ -171,7 +171,7 @@ html { scroll-behavior: smooth; }
 .hero-link { border:0;color:#fff8e8;background:transparent;font-size:13px;font-weight:700; }.hero-link span{margin-left:8px;font-size:20px;}
 .hero-stamp { position:absolute;z-index:4;right:42px;bottom:38px;display:flex;align-items:end;gap:10px;color:#fff8e8; }.hero-stamp b{font-size:54px;line-height:.8}.hero-stamp span{font-size:10px;letter-spacing:.12em;line-height:1.35;opacity:.65}
 .portfolio-nav-wrap { position:sticky;top:18px;z-index:50;margin-top:-24px;margin-bottom:-24px; }
-.portfolio-nav-wrap .floating-nav { background:rgba(255,248,229,.76);box-shadow:0 18px 50px rgba(45,48,35,.17); }
+.portfolio-nav-wrap .floating-nav { background:rgba(255,255,255,.7);box-shadow:0 18px 50px rgba(51,133,184,.18); }
 .manifesto { padding:clamp(110px,16vw,240px) max(6vw,30px);background:#f2a13a; }
 .manifesto>p { margin:0 0 26px;color:#356b68;font-size:11px;font-weight:800;letter-spacing:.26em;text-transform:uppercase; }
 .manifesto h2 { max-width:1500px;margin:0;font-size:clamp(45px,6.7vw,118px);font-weight:800;letter-spacing:-.065em;line-height:.98; }
@@ -381,10 +381,10 @@ button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-re
 button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button)):focus-visible{outline:2px solid rgba(255,255,255,.95);outline-offset:3px}
 button:where(:not(.analysis-preview):not(.profile-features>button):not(.music-records>button)):disabled{opacity:.48;scale:1;filter:saturate(.7)}
 
-.hero-primary,.spotlight-copy button{--liquid-accent:#ffca62!important}.portfolio-footer>button{--liquid-accent:#2c7f78!important}.floating-nav button,.brand-mark{--liquid-accent:#4e938c!important}.profile-pill{--liquid-accent:#7bc9c1!important}
+.hero-primary,.spotlight-copy button{--liquid-accent:#8dd7ff!important}.portfolio-footer>button{--liquid-accent:#2c7f78!important}.floating-nav button,.brand-mark{--liquid-accent:#81cfff!important}.profile-pill{--liquid-accent:#a5ddff!important}
 .feature-pronunciation button{--liquid-accent:#55d9c9}.feature-speech button{--liquid-accent:#f5a54e}.feature-analysis button{--liquid-accent:#ef7657}.feature-music button{--liquid-accent:#a98ae0}.feature-growth button{--liquid-accent:#8bbb77}.feature-teacher button{--liquid-accent:#58b5b0}
 .feature-topbar button{--liquid-accent:#ffffff}.feature-footer button{--liquid-accent:#8bc9c1}.phonetic-training-card button{--liquid-accent:#4dbeb1}.stage-training-card button{--liquid-accent:#ff9b58}.analysis-capture button{--liquid-accent:#ef7657}.teacher-panel button{--liquid-accent:#63bbb4}
-.brand-mark{border-radius:18px!important;padding:6px 10px!important}.hero-link,.feature-footer button{border-radius:999px!important;padding:10px 16px!important}.hero-primary,.spotlight-copy button{color:#173033!important;background:linear-gradient(135deg,rgba(255,225,145,.72),rgba(255,188,74,.42) 55%,rgba(255,255,255,.14))!important}.portfolio-footer>button{background:linear-gradient(135deg,rgba(45,127,119,.74),rgba(20,66,67,.5))!important}.floating-nav button.active{background:linear-gradient(135deg,rgba(85,156,149,.72),rgba(37,99,96,.5))!important}.music-play{color:#fff!important;background:linear-gradient(135deg,rgba(111,78,158,.78),rgba(38,28,66,.5))!important}
+.brand-mark{border-radius:18px!important;padding:6px 10px!important}.hero-link,.feature-footer button{border-radius:999px!important;padding:10px 16px!important}.hero-primary,.spotlight-copy button{color:#1465ca!important;background:linear-gradient(135deg,rgba(255,255,255,.86),rgba(213,241,255,.66) 55%,rgba(255,255,255,.34))!important}.hero-link{color:#1f6eb9!important;background:linear-gradient(135deg,rgba(255,255,255,.56),rgba(194,230,255,.33))!important}.portfolio-footer>button{background:linear-gradient(135deg,rgba(45,127,119,.74),rgba(20,66,67,.5))!important}.floating-nav button{color:#266aa3!important}.floating-nav button.active{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(175,224,255,.68))!important;color:#1265c3!important}.music-play{color:#fff!important;background:linear-gradient(135deg,rgba(111,78,158,.78),rgba(38,28,66,.5))!important}
 
 /* Full-screen sakura ending: the supplied art remains the scene, with only a light text veil. */
 .portfolio-footer.sakura-ending{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;min-height:100svh;padding:clamp(62px,7vw,120px) max(5vw,28px) 42px;overflow:hidden;color:#462e3d;background:#efadc0}
