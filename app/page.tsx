@@ -100,7 +100,7 @@ const featureEntries: Array<{ id: FeatureId; label: string; eyebrow: string; des
 
 const musicTracks: Record<string, string> = {
   '温暖叙事': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kevin_MacLeod_-_Long_Trail.ogg',
-  '坚定励志': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Maple_leaf_rag_-_played_by_Scott_Joplin_1916_V2.ogg',
+  '坚定励志': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Minuet_in_G_(Beethoven),_piano.ogg',
   '沉静思考': 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Emotional_piano.wav',
 };
 
