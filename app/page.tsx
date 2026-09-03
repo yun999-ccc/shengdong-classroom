@@ -142,7 +142,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const excludedCards = '.profile-features button, .analysis-preview, .music-records button';
+    const excludedCards = '.analysis-preview, .music-records button';
     const moveHighlight = (event: PointerEvent) => {
       if (!(event.target instanceof Element)) return;
       const button = event.target.closest('button') as HTMLButtonElement | null;
