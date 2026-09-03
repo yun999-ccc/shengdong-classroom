@@ -501,6 +501,7 @@ function FeatureExperience({ entry, onBack, children }: { entry: (typeof feature
       <section className="feature-cover">
         <FeatureHeroVisual id={entry.id} />
         <div className="feature-glass-title"><Icon /><small>{entry.eyebrow} / SPEECH LAB</small><h1>{entry.label}</h1><p>{entry.description}</p><span>向下进入功能 ↓</span></div>
+        {entry.id === 'speech' && <button className="speech-stage-start" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}><Mic2 />开始演讲 ↗</button>}
       </section>
       <section className="feature-workspace">{children}</section>
       <footer className="feature-footer"><button onClick={onBack}>返回全部功能</button><span>VOICE LAB · 2026</span></footer>
@@ -510,7 +511,7 @@ function FeatureExperience({ entry, onBack, children }: { entry: (typeof feature
 
 function FeatureHeroVisual({ id }: { id: FeatureId }) {
   if (id === 'pronunciation') return <div className="feature-visual pronunciation-lab" aria-hidden="true"><div className="lab-grid" /><div className="syllable-track">{['zh','ch','sh','r'].map((sound) => <span key={sound}>{sound}</span>)}</div><div className="lab-wave">{waveform.map((height,index) => <i key={`${height}-${index}`} style={{ height: `${height + 18}%` }} />)}</div><AudioLines className="lab-core" /></div>;
-  if (id === 'speech') return <div className="feature-visual speech-theatre" aria-hidden="true"><div className="curtain curtain-left" /><div className="curtain curtain-right" /><div className="theatre-beam" /><div className="topic-lottery"><small>随机题目</small><strong>如果声音有颜色</strong><span>PREP · 60</span></div><Mic2 className="theatre-mic" /></div>;
+  if (id === 'speech') return <div className="feature-visual speech-theatre" aria-hidden="true"><div className="curtain curtain-left" /><div className="curtain curtain-right" /><div className="theatre-beam" /><div className="speech-focus-question"><small>随机题目 · 即兴表达</small><strong>如果声音有颜色，<br />它会是什么？</strong><span>用一个画面、一段经历或一种感受，完成你的观点。</span></div><div className="speech-countdown-stage"><small>PREP</small><b>60</b><span>秒准备</span></div></div>;
   if (id === 'analysis') return <div className="feature-visual analysis-dashboard" aria-hidden="true"><div className="dash-score"><small>VOICE SCORE</small><strong>86</strong></div><div className="dash-bars">{[62,84,71,92,78,88,69,95].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div><div className="dash-timeline">{Array.from({ length: 18 },(_,index) => <span key={index} />)}</div></div>;
   if (id === 'music') return <div className="feature-visual music-room" aria-hidden="true"><div className="turntable"><i /><span /></div><div className="music-notes"><Music2 /><span>WARM STORY</span></div><div className="equalizer">{[28,62,44,82,58,92,36,70].map((value,index) => <i key={`${value}-${index}`} style={{ height: `${value}%` }} />)}</div></div>;
   if (id === 'growth') return <div className="feature-visual growth-path" aria-hidden="true"><div className="path-line" />{[0,1,2,3,4].map((index) => <span className={`path-node node-${index}`} key={index}>{index === 4 ? <Trophy /> : index + 1}</span>)}<div className="growth-badge"><Sparkles /><strong>连续 4 天</strong></div></div>;
