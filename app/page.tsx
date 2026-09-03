@@ -475,7 +475,7 @@ export default function Home() {
 
       <section className="showcase-section analysis-scene" id="analysis">
         <div className="scene-heading"><span>03 / RECORDING ANALYSIS</span><h2>一次录音<br />不只得到一个分数</h2><p>把语速、停顿、口头语和表达结构拆成可理解、可行动的课堂反馈。</p></div>
-        <button className="analysis-preview" onClick={() => openFeature('analysis')}><div className="score-hero"><span>综合表现</span><strong>{result.overall}</strong><small>点击进入录音诊断</small></div><div className="analysis-lines">{[['发音清晰度',result.clarity],['表达流畅度',result.fluency],['结构完整度',result.structure]].map(([label,value]) => <MetricBar key={label as string} label={label as string} value={value as number} color="#f1ad3f" />)}<div className="music-inline"><Music2 /><div><b>演讲配乐</b><span>{musicMode}</span></div><span className="analysis-enter">进入功能 ↗</span></div></div></button>
+        <button className="analysis-preview" onClick={() => openFeature('analysis')}><div className="score-hero"><span>综合表现</span><strong>{result.overall}</strong><small>点击进入录音诊断</small></div><div className="analysis-lines">{[['发音清晰度',result.clarity],['表达流畅度',result.fluency],['结构完整度',result.structure]].map(([label,value]) => <MetricBar key={label as string} label={label as string} value={value as number} color="#19a8ed" />)}<div className="music-inline"><Music2 /><div><b>演讲配乐</b><span>{musicMode}</span></div><span className="analysis-enter">进入功能 ↗</span></div></div></button>
       </section>
 
       <SpotlightEnding onEnter={() => openFeature('pronunciation')} />
