@@ -564,10 +564,19 @@ function AnalysisStudio(props: {
 }
 
 function SpotlightEnding({ onEnter }: { onEnter: () => void }) {
+  const frameRef = useRef<number | null>(null);
+  const pointRef = useRef({ x: 0, y: 0 });
+
   function moveSpotlight(event: React.PointerEvent<HTMLElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
-    event.currentTarget.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+    pointRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const target = event.currentTarget;
+    if (frameRef.current !== null) return;
+    frameRef.current = window.requestAnimationFrame(() => {
+      target.style.setProperty('--spot-x', `${pointRef.current.x}px`);
+      target.style.setProperty('--spot-y', `${pointRef.current.y}px`);
+      frameRef.current = null;
+    });
   }
   return (
     <section className="spotlight-ending" onPointerMove={moveSpotlight}>
